@@ -15,6 +15,7 @@ class Login extends StatefulWidget {
 
 TextEditingController email = TextEditingController();
 TextEditingController pass = TextEditingController();
+
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 class _LoginState extends State<Login> {
@@ -228,6 +229,8 @@ class _LoginState extends State<Login> {
 
    try{
      await authService.signInWithEmailPassword(email.text, pass.text);
+     email.clear();
+     pass.clear();
      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Home()));
    }catch (e){
      showDialog(context: context, builder: (context)=> AlertDialog(
