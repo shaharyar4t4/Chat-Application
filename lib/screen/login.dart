@@ -1,6 +1,8 @@
 import 'package:appdev/constant/colour_screen.dart';
+import 'package:appdev/screen/auth_serivces.dart';
 import 'package:appdev/screen/home.dart';
 import 'package:appdev/screen/signup.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ class Login extends StatefulWidget {
 
 TextEditingController email = TextEditingController();
 TextEditingController pass = TextEditingController();
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 class _LoginState extends State<Login> {
   @override
@@ -126,7 +129,8 @@ class _LoginState extends State<Login> {
               onPressed: () {
                 // Navigator.push(
                 //     context, MaterialPageRoute(builder: (context) => Home()));
-                firbaselogin();
+
+                login(context);
               },
               child: Text(
                 "Sign in",
@@ -219,51 +223,20 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void firbaselogin() async{
-    try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.text,
-        password: pass.text,
-      );
-      final snackBar = SnackBar(
-        backgroundColor: boldtxt,
-        content: const Text('Your are login now...', style: TextStyle(color: Colors.white),),
-        action: SnackBarAction(
-          label: '',
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      email.clear();
-      pass.clear();
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Home()));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        final snackBar = SnackBar(
-          backgroundColor: Colors.red,
-          content: const Text('No user found for that email.', style: TextStyle(color: Colors.white),),
-          action: SnackBarAction(
-            label: '',
-            onPressed: () {
-            },
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      } else if (e.code == 'wrong-password') {
-        final snackBar = SnackBar(
-          backgroundColor: Colors.lightBlueAccent,
-          content: const Text('Wrong password provided for that user.', style: TextStyle(color: Colors.black),),
-          action: SnackBarAction(
-            label: '',
-            onPressed: () {
-            },
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
-    }
+  void login(BuildContext context) async{
+   final authService = AuthService();
+
+   try{
+     await authService.signInWithEmailPassword(email.text, pass.text);
+     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Home()));
+   }catch (e){
+     showDialog(context: context, builder: (context)=> AlertDialog(
+       title: Text(e.toString()),
+     ));
+   }
+
   }
+
+
+
 }
