@@ -1,4 +1,4 @@
-# appdev
+# Chat Application
 
 A new Flutter project.
 
